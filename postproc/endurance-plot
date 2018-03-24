@@ -23,8 +23,10 @@
 # 02110-1301 USA
 
 use v5.10;
-
 use strict;
+use FindBin;
+
+use lib "$FindBin::Bin/../postproc-lib/lib";
 
 use SP::Endurance::Parser qw/parse_dir/;
 use SP::Endurance::Plotter;

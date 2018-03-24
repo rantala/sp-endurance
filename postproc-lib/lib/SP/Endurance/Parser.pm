@@ -24,8 +24,6 @@ use v5.10;
 
 package SP::Endurance::Parser;
 
-use SP::Endurance;
-
 require Exporter;
 @ISA = qw/Exporter/;
 @EXPORT_OK = qw/parse_openfds FD_DISK FD_EPOLL FD_EVENTFD FD_INOTIFY FD_PIPE
@@ -46,7 +44,7 @@ use JSON qw/decode_json/;
 eval 'use common::sense';
 use strict;
 
-eval q/use Inline C => 'DATA', VERSION => $SP::Endurance::VERSION, NAME => 'SP::Endurance::Parser'/;
+eval 'use Inline C => "DATA", NAME => "SP::Endurance::Parser"';
 
 my @process_blacklist = qw/
     sp-noncached
