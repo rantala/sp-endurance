@@ -2253,6 +2253,42 @@ sub generate_plot_softirqs_per_cpu {
 }
 BEGIN { register_generator \&generate_plot_softirqs_per_cpu; }
 
+sub generate_plot_diskstats_read_ticks {
+    my $plotter = shift;
+    my $masterdb = shift;
+
+    my @devices = uniq map { keys %{$_->{'/proc/diskstats'} // {}} } @$masterdb;
+    return unless @devices > 0;
+
+    my $plot = $plotter->new_linespoints(
+        key => '2099_diskstats_utilization',
+        label => 'Disk utilization, calculated from I/O ticks\n' .
+                 '(number of milliseconds during which the device had I/O requests queued)\n' .
+                 'Based on /proc/diskstats io_ticks field',
+        legend => 'DISK UTILIZATION',
+        ylabel => 'percent',
+        ymin => 0,
+        ymax => 120,
+    );
+
+    foreach my $device (@devices) {
+        $plot->push(
+            [nonzero change_per_second $masterdb, cumulative_to_changes map {
+                exists $_->{'/proc/diskstats'}->{$device} &&
+                exists $_->{'/proc/diskstats'}->{$device}->{io_ticks} ?
+                      ($_->{'/proc/diskstats'}->{$device}->{io_ticks} / 1000) * 100 :
+                       undef
+                } @$masterdb],
+            title => fs_to_mountpoint($device, $masterdb),
+        );
+    }
+
+    $plot->sort(sub { shift->[-1] });
+
+    done_plotting $plot;
+}
+BEGIN { register_generator \&generate_plot_diskstats_read_ticks; }
+
 sub generate_plot_diskstats_reads_mb {
     my $plotter = shift;
     my $masterdb = shift;
