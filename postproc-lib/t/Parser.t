@@ -871,63 +871,83 @@ is_deeply(parse_diskstats(IO::String->new("\n\n\n")), {}, 'parse_diskstats - inp
 
 is_deeply(parse_diskstats(IO::String->new(<< 'END'
    8      16 sdb 2181841 970541 45107598 10074568 224702 466148 11030291 9761856 0 8827440 19869896
-   8       2 sda2 2 0 4 0 0 0 0 0 0 0 0
+   8       2 sda2 0 0 4 0 0 0 0 0 0 0 0
    8       5 sda5 161868 14587 1405729 820588 21474 339504 2904552 1493396 0 188536 2314196
   11       0 sr0 0 0 0 0 0 0 0 0 0 0 0
+ 253       3 dm-3 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 END
 )), {
     sdb => {
-        #majdev => 8,
-        #mindev => 16,
-        #reads_completed => 2181841,
-        #reads_merged => 970541,
-        sectors_read => 45107598,
-        #ms_spent_reading => 10074568,
-        #writes_completed => 224702,
-        #writes_merged => 466148,
-        sectors_written => 11030291,
-        #ms_spent_writing => 9761856,
-        #ios_in_progress => 0,
-        #ms_spent_io => 8827440,
-        #ms_spent_io_weighted => 19869896,
+        majdev => 8,
+        mindev => 16,
+        device => 'sdb',
+        read_ios => 2181841,
+        read_merges => 970541,
+        read_sectors => 45107598,
+        read_ticks => 10074568,
+        write_ios => 224702,
+        write_merges => 466148,
+        write_sectors => 11030291,
+        write_ticks => 9761856,
+        io_flight => 0,
+        io_ticks => 8827440,
+        time_in_queue => 19869896,
     },
     sda2 => {
-        #majdev => 8,
-        #mindev => 2,
-        #reads_completed => 2,
-        #reads_merged => 0,
-        sectors_read => 4,
-        #ms_spent_reading => 0,
-        #writes_completed => 0,
-        #writes_merged => 0,
-        sectors_written => 0,
-        #ms_spent_writing => 0,
-        #ios_in_progress => 0,
-        #ms_spent_io => 0,
-        #ms_spent_io_weighted => 0,
+        majdev => 8,
+        mindev => 2,
+        device => 'sda2',
+        read_ios => 0,
+        read_merges => 0,
+        read_sectors => 4,
+        read_ticks => 0,
+        write_ios => 0,
+        write_merges => 0,
+        write_sectors => 0,
+        write_ticks => 0,
+        io_flight => 0,
+        io_ticks => 0,
+        time_in_queue => 0,
     },
     sda5 => {
-        #majdev => 8,
-        #mindev => 5,
-        #reads_completed => 161868,
-        #reads_merged => 14587,
-        sectors_read => 1405729,
-        #ms_spent_reading => 820588,
-        #writes_completed => 21474,
-        #writes_merged => 339504,
-        sectors_written => 2904552,
-        #ms_spent_writing => 1493396,
-        #ios_in_progress => 0,
-        #ms_spent_io => 188536,
-        #ms_spent_io_weighted => 2314196,
+        majdev => 8,
+        mindev => 5,
+        device => 'sda5',
+        read_ios => 161868,
+        read_merges => 14587,
+        read_sectors => 1405729,
+        read_ticks => 820588,
+        write_ios => 21474,
+        write_merges => 339504,
+        write_sectors => 2904552,
+        write_ticks => 1493396,
+        io_flight => 0,
+        io_ticks => 188536,
+        time_in_queue => 2314196,
     },
-}, 'parse_diskstats - 1x node, 1x zone, 5x pagetype');
-
-is_deeply(parse_diskstats(IO::String->new(<< 'END'
-END
-)), {
-}, 'parse_diskstats - 2x node, 3x zone, 1x pagetype');
-
+    'dm-3' => {
+        majdev => 253,
+        mindev => 3,
+        device => 'dm-3',
+        read_ios => 1,
+        read_merges => 2,
+        read_sectors => 3,
+        read_ticks => 4,
+        write_ios => 5,
+        write_merges => 6,
+        write_sectors => 7,
+        write_ticks => 8,
+        io_flight => 9,
+        io_ticks => 10,
+        time_in_queue => 11,
+        discard_ios => 12,
+        discard_merges => 13,
+        discard_sectors => 14,
+        discard_ticks => 15,
+        flush_ios => 16,
+        flush_ticks => 17,
+    },
+}, 'parse_diskstats - 5x entries');
 
 ###### parse_sysfs_fs ######
 

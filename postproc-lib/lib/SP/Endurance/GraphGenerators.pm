@@ -2262,7 +2262,8 @@ sub generate_plot_diskstats_reads_mb {
 
     my $plot = $plotter->new_linespoints(
         key => '2100_diskstats_reads_mb',
-        label => 'Bytes read from device',
+        label => 'Bytes read from device\n' .
+                 'Based on /proc/diskstats read_sectors field',
         legend => 'DISK READS &mdash; MB',
         ylabel => 'MB',
     );
@@ -2271,9 +2272,9 @@ sub generate_plot_diskstats_reads_mb {
         $plot->push(
             [b2mb nonzero cumulative_to_changes map {
                 exists $_->{'/proc/diskstats'}->{$device} &&
-                exists $_->{'/proc/diskstats'}->{$device}->{sectors_read} ?
-                    $_->{'/proc/diskstats'}->{$device}->{sectors_read} * SECTOR_SIZE :
-                    undef
+                exists $_->{'/proc/diskstats'}->{$device}->{read_sectors} ?
+                       $_->{'/proc/diskstats'}->{$device}->{read_sectors} * SECTOR_SIZE :
+                       undef
                 } @$masterdb],
             title => fs_to_mountpoint($device, $masterdb),
         );
@@ -2294,7 +2295,8 @@ sub generate_plot_diskstats_reads_mb_per_second {
 
     my $plot = $plotter->new_linespoints(
         key => '2100_diskstats_reads_mb_per_second',
-        label => 'Bytes read from device per second',
+        label => 'Bytes read from device per second\n' .
+                 'Based on /proc/diskstats read_sectors field',
         legend => 'DISK READS &mdash; MB/s',
         ylabel => 'MB per second',
     );
@@ -2303,8 +2305,8 @@ sub generate_plot_diskstats_reads_mb_per_second {
         $plot->push(
             [b2mb nonzero change_per_second $masterdb, cumulative_to_changes map {
                 exists $_->{'/proc/diskstats'}->{$device} &&
-                exists $_->{'/proc/diskstats'}->{$device}->{sectors_read} ?
-                       $_->{'/proc/diskstats'}->{$device}->{sectors_read} * SECTOR_SIZE :
+                exists $_->{'/proc/diskstats'}->{$device}->{read_sectors} ?
+                       $_->{'/proc/diskstats'}->{$device}->{read_sectors} * SECTOR_SIZE :
                        undef
             } @$masterdb],
             title => fs_to_mountpoint($device, $masterdb),
@@ -2326,7 +2328,8 @@ sub generate_plot_diskstats_written_mb {
 
     my $plot = $plotter->new_linespoints(
         key => '2100_diskstats_written_mb',
-        label => 'Bytes written to device',
+        label => 'Bytes written to device\n' .
+                 'Based on /proc/diskstats write_sectors field',
         legend => 'DISK WRITES &mdash; MB',
         ylabel => 'MB',
     );
@@ -2335,9 +2338,9 @@ sub generate_plot_diskstats_written_mb {
         $plot->push(
             [b2mb nonzero cumulative_to_changes map {
                 exists $_->{'/proc/diskstats'}->{$device} &&
-                exists $_->{'/proc/diskstats'}->{$device}->{sectors_written} ?
-                    $_->{'/proc/diskstats'}->{$device}->{sectors_written} * SECTOR_SIZE :
-                    undef
+                exists $_->{'/proc/diskstats'}->{$device}->{write_sectors} ?
+                       $_->{'/proc/diskstats'}->{$device}->{write_sectors} * SECTOR_SIZE :
+                       undef
             } @$masterdb],
             title => fs_to_mountpoint($device, $masterdb),
         );
@@ -2358,7 +2361,8 @@ sub generate_plot_diskstats_written_mb_per_second {
 
     my $plot = $plotter->new_linespoints(
         key => '2100_diskstats_written_mb_per_second',
-        label => 'Bytes written to device per second',
+        label => 'Bytes written to device per second\n' .
+                 'Based on /proc/diskstats write_sectors field',
         legend => 'DISK WRITES &mdash; MB/s',
         ylabel => 'MB per second',
     );
@@ -2367,8 +2371,8 @@ sub generate_plot_diskstats_written_mb_per_second {
         $plot->push(
             [b2mb nonzero change_per_second $masterdb, cumulative_to_changes map {
                 exists $_->{'/proc/diskstats'}->{$device} &&
-                exists $_->{'/proc/diskstats'}->{$device}->{sectors_written} ?
-                       $_->{'/proc/diskstats'}->{$device}->{sectors_written} * SECTOR_SIZE :
+                exists $_->{'/proc/diskstats'}->{$device}->{write_sectors} ?
+                       $_->{'/proc/diskstats'}->{$device}->{write_sectors} * SECTOR_SIZE :
                        undef
             } @$masterdb],
             title => fs_to_mountpoint($device, $masterdb),

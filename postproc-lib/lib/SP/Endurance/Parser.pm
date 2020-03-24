@@ -47,6 +47,8 @@ use JSON qw/decode_json/;
 eval 'use common::sense';
 use strict;
 
+$Data::Dumper::Sortkeys = 1;
+
 eval q/use Inline C => 'DATA', VERSION => $SP::Endurance::VERSION, NAME => 'SP::Endurance::Parser'/;
 
 my @process_blacklist = qw/
@@ -452,31 +454,55 @@ sub parse_diskstats {
 
     my %diskstats;
 
-    my @keys = qw/majdev mindev device reads_completed reads_merged
-        sectors_read ms_spent_reading writes_completed writes_merged
-        sectors_written ms_spent_writing ios_in_progress ms_spent_io
-        ms_spent_io_weighted/;
+    my @keys = qw/
+        majdev
+        mindev
+        device
+        read_ios
+        read_merges
+        read_sectors
+        read_ticks
+        write_ios
+        write_merges
+        write_sectors
+        write_ticks
+        io_flight
+        io_ticks
+        time_in_queue
+        discard_ios
+        discard_merges
+        discard_sectors
+        discard_ticks
+        flush_ios
+        flush_ticks
+    /;
 
     while (<$fh>) {
         chomp;
 
         my @values = split;
-        next unless @values == @keys;
 
-        my %entry = zip @keys, @values;
+        # incomplete data?
+        next if @values < 4;
 
         # Ignore all-zero entries.
-        next if all { $_ == 0 } @values[3,-1];
+        next if all { $_ == 0 } @values[3 .. scalar(@values)-1];
 
+        my @k = @keys;
+        if (@values < @k) {
+            # older kernel version without all fields
+            @k = @k[0 .. scalar(@values)-1];
+        } elsif (@values > @k) {
+            # new kernel version, more fields are added?
+            @values = @values[0 .. scalar(@k)-1];
+        }
+
+        my %entry = zip @k, @values;
         my $device = $entry{device};
-
-        # Take only what we really use to save some memory.
-        $diskstats{$device} = {
-            sectors_read    => $entry{sectors_read},
-            sectors_written => $entry{sectors_written},
-        };
+        $diskstats{$device} = \%entry;
     }
 
+    #print STDERR Dumper \%diskstats;
     return \%diskstats;
 }
 
