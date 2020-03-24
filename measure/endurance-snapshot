@@ -475,6 +475,11 @@ fi
 echo "- Disk usage"
 LC_ALL=C df -k -P > $path/df
 
+if type stat >/dev/null 2>/dev/null ; then
+	stat -c '%N' /dev/disk/*/* >$path/dev-disk
+	[ -f $path/dev-disk ] && [ ! -s $path/dev-disk ] && rm $path/dev-disk
+fi
+
 echo "- statefs"
 dump_statefs_value namespaces/Screen/Blanked
 
